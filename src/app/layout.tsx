@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "后台管理系统",
-  description: "基于 Next.js + Ant Design 的后台管理系统",
+  title: "悦普信息化管理系统",
+  description: "基于 Next.js + Ant Design 的信息化管理系统",
 };
 
 export default function RootLayout({

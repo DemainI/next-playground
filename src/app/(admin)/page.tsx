@@ -13,7 +13,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* 欢迎区域 */}
       <div className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
-        <h1 className="text-2xl font-semibold">欢迎使用后台管理系统</h1>
+        <h1 className="text-2xl font-semibold">欢迎使用悦普信息化管理系统</h1>
         <p className="mt-2 text-blue-100">
           这是仪表盘页面，您可以在这里查看系统概览信息
         </p>

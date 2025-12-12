@@ -103,7 +103,7 @@ export default function Sidebar() {
           </div>
           {!collapsed && (
             <span className="whitespace-nowrap text-base font-semibold text-white">
-              后台管理系统
+              悦普信息化管理系统
             </span>
           )}
         </div>

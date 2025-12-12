@@ -55,17 +55,7 @@ export default function AdminLayout({
         setActiveTab,
       }}
     >
-      <ConfigProvider
-        theme={{
-          components: {
-            Layout: {
-              siderBg: "#001529",
-              triggerBg: "#002140",
-              bodyBg: "#f5f5f5",
-            },
-          },
-        }}
-      >
+      <ConfigProvider>
         <Layout className="h-screen">
           {/* 侧边栏 */}
           <Sidebar />

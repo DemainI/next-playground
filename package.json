@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "format": "prettier --write .",
+    "lint:check": "eslint",
+    "lint:fix": "eslint --fix",
+    "format:write": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
   },

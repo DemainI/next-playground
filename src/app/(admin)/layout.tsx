@@ -4,6 +4,7 @@ import { useState, createContext, useContext } from "react";
 import { Layout, ConfigProvider } from "antd";
 import Sidebar from "./components/Sidebar";
 import HeaderNav from "./components/HeaderNav";
+import AuthGuard from "./AuthGuard";
 
 const { Content } = Layout;
 
@@ -66,7 +67,7 @@ export default function AdminLayout({
 
             {/* 内容区 */}
             <Content className="m-4 overflow-auto rounded-lg bg-white p-6">
-              {children}
+              <AuthGuard>{children}</AuthGuard>
             </Content>
           </Layout>
         </Layout>

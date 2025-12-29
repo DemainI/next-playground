@@ -23,6 +23,7 @@ import {
 } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { useLayoutContext } from "../layout";
+import { logout } from "@/services/auth";
 
 const { Header } = Layout;
 
@@ -116,7 +117,12 @@ export default function HeaderNav() {
 
   const handleUserMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "logout") {
-      router.push("/login");
+      logout().then((res: any) => {
+        if (res.code === 200) {
+          window.localStorage.removeItem("ACCESS_TOKEN");
+          router.push("/login");
+        }
+      });
     }
   };
 

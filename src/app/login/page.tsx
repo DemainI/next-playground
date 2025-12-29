@@ -1,28 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Input, Button, Card, message } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  LockOutlined,
+  CheckCircleOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import { login, getCaptcha } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 interface LoginForm {
   username: string;
   password: string;
+  code: string;
 }
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+  const [captchaHtml, setCaptchaHtml] = useState<string>("");
+  const [captchaUuid, setCaptchaUuid] = useState<string>("");
+  const [captchaEnabled, setCaptchaEnabled] = useState(false);
+  const router = useRouter();
+
+  // 获取验证码
+  const fetchCaptcha = async () => {
+    setCaptchaLoading(true);
+    try {
+      const res = await getCaptcha();
+      if (res && typeof res === "object" && "data" in res) {
+        const data = res.data as {
+          img?: string;
+          uuid?: string;
+          captchaEnabled?: boolean;
+        };
+        if (data.img) {
+          setCaptchaHtml(data.img);
+        }
+        if (data.uuid) {
+          setCaptchaUuid(data.uuid);
+        }
+        if (data.captchaEnabled !== undefined) {
+          setCaptchaEnabled(data.captchaEnabled);
+        }
+      }
+    } catch {
+      message.error("获取验证码失败，请稍后重试");
+    } finally {
+      setCaptchaLoading(false);
+    }
+  };
+
+  // 组件挂载时获取验证码
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
 
   const handleSubmit = async (values: LoginForm) => {
     setLoading(true);
 
-    // 模拟登录请求
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log("登录信息:", values);
-    message.success("登录成功！");
-    setLoading(false);
-
-    // TODO: 实际登录逻辑
+    try {
+      const res = await login({
+        userName: values.username,
+        password: values.password,
+        code: values.code,
+        uuid: captchaUuid,
+      });
+      const { token } = res.data;
+      if (token) {
+        window.localStorage.setItem("ACCESS_TOKEN", token);
+      }
+      message.success(res.msg);
+      router.push("/");
+    } catch (error) {
+      const err = error as Error;
+      message.error(err.message || "登录失败，请稍后重试");
+      // 登录失败后刷新验证码
+      fetchCaptcha();
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,6 +128,39 @@ export default function LoginPage() {
                 placeholder="请输入密码"
               />
             </Form.Item>
+
+            {captchaEnabled && (
+              <Form.Item
+                name="code"
+                label="验证码"
+                rules={[{ required: true, message: "请输入验证码" }]}
+              >
+                <div className="flex gap-2">
+                  <Input
+                    prefix={<CheckCircleOutlined className="text-gray-400" />}
+                    placeholder="请输入验证码"
+                    className="flex-1"
+                  />
+                  {/* 验证码显示区域 */}
+                  <div
+                    className="flex h-10 w-32 cursor-pointer items-center justify-center rounded border border-gray-300 bg-white transition-colors hover:border-blue-400"
+                    onClick={fetchCaptcha}
+                    title="点击刷新验证码"
+                  >
+                    {captchaLoading ? (
+                      <span className="text-gray-400">加载中...</span>
+                    ) : captchaHtml ? (
+                      <div
+                        dangerouslySetInnerHTML={{ __html: captchaHtml }}
+                        className="flex h-full w-full items-center justify-center"
+                      />
+                    ) : (
+                      <ReloadOutlined className="text-gray-400" />
+                    )}
+                  </div>
+                </div>
+              </Form.Item>
+            )}
 
             <Form.Item className="mb-0 mt-6">
               <Button
